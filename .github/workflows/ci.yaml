@@ -286,6 +286,6 @@ jobs:
             -Dpackaging=jar \
             -Dfile=target/contract-library-1.0-SNAPSHOT-obfuscated.jar \
             -DrepositoryId=github \
-            -Durl=https://maven.pkg.github.com/6-bank-organization/sixbank-account-library
+            -Durl=https://maven.pkg.github.com/martourez21/contract-library
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
