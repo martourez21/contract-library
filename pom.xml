@@ -5,22 +5,21 @@
 
   <groupId>com.contractlibs</groupId>
   <artifactId>contract-library</artifactId>
-  <version>3.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <version>2.0-SNAPSHOT</version>
   <name>contract-library</name>
-  <url>https://github.com/martourez21/contract-library</url>
+  <url>http://maven.apache.org</url>
 
   <properties>
     <java.version>17</java.version>
-    <maven.compiler.source>${java.version}</maven.compiler.source>
-    <maven.compiler.target>${java.version}</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <build>
+
+
     <plugins>
 
-      <!-- Compiler Plugin -->
+      <!-- Compile Java -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -31,22 +30,14 @@
         </configuration>
       </plugin>
 
-      <!-- Source JAR -->
+      <!-- Run tests -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <version>3.2.1</version>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
       </plugin>
 
-      <!-- Javadoc JAR -->
+      <!-- Generate Javadoc JAR -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -61,19 +52,64 @@
         </executions>
       </plugin>
 
+      <!-- Generate Source JAR -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.3.0</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- ProGuard Obfuscation -->
+      <plugin>
+        <groupId>com.github.wvengen</groupId>
+        <artifactId>proguard-maven-plugin</artifactId>
+<!--        <version>2.0.17</version>-->
+        <executions>
+          <execution>
+            <id>obfuscate</id>
+            <phase>package</phase>
+            <goals>
+              <goal>proguard</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <obfuscate>true</obfuscate>
+          <shrink>true</shrink>
+          <optimize>true</optimize>
+          <injars>
+            <injar>${project.build.directory}/${project.build.finalName}.jar</injar>
+          </injars>
+          <outjars>
+            <outjar>${project.build.directory}/${project.build.finalName}-obfuscated.jar</outjar>
+          </outjars>
+          <printmapping>${project.build.directory}/proguard/mapping.txt</printmapping>
+          <libraryjars>
+            <libraryjar>${java.home}/lib/rt.jar</libraryjar>
+          </libraryjars>
+        </configuration>
+      </plugin>
+
     </plugins>
   </build>
 
-  <!-- Publishing Configuration -->
+  <!-- Deploy Config -->
   <distributionManagement>
     <repository>
       <id>github</id>
-      <name>GitHub Packages</name>
       <url>https://maven.pkg.github.com/martourez21/contract-library</url>
     </repository>
   </distributionManagement>
 
-  <!-- Optional if your repo requires credentials -->
+  <!-- GitHub Credentials -->
   <repositories>
     <repository>
       <id>github</id>
