@@ -40,7 +40,7 @@ This library provides:
 <dependency>
     <groupId>com.contractlibs</groupId>
     <artifactId>contract-library</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>2.0-SNAPSHOT</version>
 </dependency>
 ````
 

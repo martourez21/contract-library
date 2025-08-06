@@ -38,8 +38,8 @@ import java.security.SecureRandom;
  * boolean isValid = AccountNumberGenerator.isValidAccountNumber(accountNumber, prefix);
  * }</pre>
  *
- * @author SIX Bank Engineering Team
- * @since 0.0.4-SNAPSHOT
+ * @author Nestor Abiangang A.
+ * @since 1.0-SNAPSHOT
  */
 public final class AccountNumberGenerator {
 
