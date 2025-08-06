@@ -40,14 +40,14 @@ This library provides:
 <dependency>
     <groupId>com.contractlibs</groupId>
     <artifactId>contract-library</artifactId>
-    <version>2.0-SNAPSHOT</version>
+    <version>3.0-SNAPSHOT</version>
 </dependency>
 ````
 
 ### Gradle
 
 ```groovy
-implementation 'com.contractlibs:contract-library:1.0-SNAPSHOT'
+implementation 'com.contractlibs:contract-library:3.0-SNAPSHOT'
 ```
 
 ---
