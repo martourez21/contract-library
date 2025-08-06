@@ -127,8 +127,8 @@ jobs:
           curl -L -o proguard.zip "https://github.com/Guardsquare/proguard/releases/download/v7.4.2/proguard-7.4.2.zip"
           unzip proguard.zip
 
-          INPUT_JAR=$(realpath target/contract-library-1.0-SNAPSHOT.jar)
-          OUTPUT_JAR=$(realpath target/contract-library-1.0-SNAPSHOT-obfuscated.jar)
+          INPUT_JAR=$(realpath target/contract-library-2.0-SNAPSHOT.jar)
+          OUTPUT_JAR=$(realpath target/contract-library-2.0-SNAPSHOT-obfuscated.jar)
           JAVA_HOME_PATH=$(realpath $JAVA_HOME)
 
           if [ ! -f "$INPUT_JAR" ]; then
