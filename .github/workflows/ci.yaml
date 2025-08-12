@@ -69,7 +69,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - run: sudo apt-get update && sudo apt-get install -y maven
-      - name: Configure Maven settings (same as build)
+      - name: Configure Maven settings
         run: |
           mkdir -p ~/.m2
           cat <<EOF > ~/.m2/settings.xml
@@ -101,39 +101,43 @@ jobs:
         with:
           name: regular-jar-${{ github.sha }}
           path: target/
+      - name: List files in target before ProGuard
+        run: ls -la target/
       - name: Prepare ProGuard and run obfuscation
         run: |
           curl -L -o proguard.zip "https://github.com/Guardsquare/proguard/releases/download/v7.4.2/proguard-7.4.2.zip"
           unzip proguard.zip
-
-          INPUT_JAR=$(realpath target/contract-library-2.0-SNAPSHOT.jar)
-          OUTPUT_JAR=$(realpath target/contract-library-2.0-SNAPSHOT-obfuscated.jar)
+          
+          INPUT_JAR=target/contract-library-2.0-SNAPSHOT.jar
+          OUTPUT_JAR=target/contract-library-2.0-SNAPSHOT-obfuscated.jar
           JAVA_HOME_PATH=$(realpath $JAVA_HOME)
-
+          
           if [ ! -f "$INPUT_JAR" ]; then
             echo "Input JAR not found: $INPUT_JAR"
             ls -la target/
             exit 1
           fi
-
+          
           mkdir -p target/proguard-config
           cat <<EOF > target/proguard-config/proguard.pro
           -injars $INPUT_JAR
           -outjars $OUTPUT_JAR
           -libraryjars $JAVA_HOME_PATH/jmods/java.base.jmod(!**.jar;!module-info.class)
-
+          
           -allowaccessmodification
           -dontoptimize
           -dontpreverify
           -dontshrink
-
+          
           -keep public class com.contractlibs.** { *; }
           -keepattributes Signature,InnerClasses,EnclosingMethod
           -keepclassmembers class * implements java.io.Serializable { *; }
           -dontwarn
           EOF
-
+          
           java -jar proguard-7.4.2/lib/proguard.jar @target/proguard-config/proguard.pro
+      - name: List files in target after ProGuard
+        run: ls -la target/
       - uses: actions/upload-artifact@v4
         with:
           name: obfuscated-jar-${{ github.sha }}
