@@ -39,9 +39,9 @@ jobs:
           <settings>
             <servers>
               <server>
-                <id>github</id>
-                <username>${{ github.actor }}</username>
-                <password>${{ secrets.GITHUB_TOKEN }}</password>
+                <id>central</id>
+                <username>${{ secrets.CENTRAL_TOKEN_USERNAME }}</username>
+                <password>${{ secrets.CENTRAL_TOKEN_PASSWORD }}</password>
               </server>
             </servers>
             <profiles>
@@ -94,9 +94,9 @@ jobs:
           <settings>
             <servers>
               <server>
-                <id>github</id>
-                <username>${{ github.actor }}</username>
-                <password>${{ secrets.GITHUB_TOKEN }}</password>
+                <id>central</id>
+                <username>${{ secrets.CENTRAL_TOKEN_USERNAME }}</username>
+                <password>${{ secrets.CENTRAL_TOKEN_PASSWORD }}</password>
               </server>
             </servers>
             <profiles>
@@ -222,12 +222,10 @@ jobs:
           git commit -m "Deploy Javadocs for ${{ github.sha }}" || echo "No changes to commit"
           git push --force origin HEAD:gh-pages
 
-  deploy-package:
+  deploy-maven-central:
     runs-on: ubuntu-latest
     needs: obfuscate
-
-    permissions:
-      packages: write
+    if: github.ref == 'refs/heads/main' # Only deploy on main branch
 
     steps:
       - name: Checkout code
@@ -242,6 +240,14 @@ jobs:
       - name: Install Maven
         run: sudo apt-get update && sudo apt-get install -y maven
 
+      - name: Import GPG key
+        run: |
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | base64 --decode | gpg --import --batch --yes
+          echo "use-agent" >> ~/.gnupg/gpg.conf
+          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+
       - name: Configure Maven settings
         run: |
           mkdir -p ~/.m2
@@ -249,12 +255,22 @@ jobs:
           <settings>
             <servers>
               <server>
-                <id>github</id>
-                <username>${{ github.actor }}</username>
-                <password>${{ secrets.GITHUB_TOKEN }}</password>
+                <id>central</id>
+                <username>${{ secrets.CENTRAL_TOKEN_USERNAME }}</username>
+                <password>${{ secrets.CENTRAL_TOKEN_PASSWORD }}</password>
               </server>
             </servers>
             <profiles>
+              <profile>
+                <id>central</id>
+                <activation>
+                  <activeByDefault>true</activeByDefault>
+                </activation>
+                <properties>
+                  <gpg.executable>gpg</gpg.executable>
+                  <gpg.passphrase>${{ secrets.GPG_PASSPHRASE }}</gpg.passphrase>
+                </properties>
+              </profile>
               <profile>
                 <id>guardsquare</id>
                 <repositories>
@@ -266,6 +282,7 @@ jobs:
               </profile>
             </profiles>
             <activeProfiles>
+              <activeProfile>central</activeProfile>
               <activeProfile>guardsquare</activeProfile>
             </activeProfiles>
           </settings>
@@ -277,15 +294,15 @@ jobs:
           name: obfuscated-jar-${{ github.sha }}
           path: target/
 
-      - name: Deploy to GitHub Packages
+      - name: Build sources and javadoc JARs
+        run: mvn clean compile source:jar javadoc:jar -DskipTests
+
+      - name: Replace main JAR with obfuscated version
         run: |
-          mvn deploy:deploy-file \
-            -DgroupId=com.contractlibs \
-            -DartifactId=contract-library \
-            -Dversion=2.0-SNAPSHOT \
-            -Dpackaging=jar \
-            -Dfile=target/contract-library-2.0-SNAPSHOT-obfuscated.jar \
-            -DrepositoryId=github \
-            -Durl=https://maven.pkg.github.com/martourez21/contract-library
+          mv target/contract-library-2.0-SNAPSHOT-obfuscated.jar target/contract-library-2.0-SNAPSHOT.jar
+
+      - name: Deploy to Maven Central
+        run: mvn deploy -DskipTests
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
+          CENTRAL_TOKEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
