@@ -107,7 +107,7 @@ jobs:
           unzip proguard.zip
 
           INPUT_JAR=$(realpath target/contract-library-2.0-SNAPSHOT.jar)
-          OUTPUT_JAR=$(realpath target/contract-library-2.0-SNAPSHOT-obfuscated.jar)
+          OUTPUT_JAR=$(realpath target/contract-library-2.0-SNAPSHOT.jar-obfuscated.jar)
           JAVA_HOME_PATH=$(realpath $JAVA_HOME)
 
           if [ ! -f "$INPUT_JAR" ]; then
@@ -239,10 +239,10 @@ jobs:
         with:
           name: obfuscated-jar-${{ github.sha }}
           path: target/
-      - name: Build sources and javadoc JARs
-        run: mvn clean compile source:jar javadoc:jar -DskipTests
+      - name: List target files before rename
+        run: ls -la target/
       - name: Replace main JAR with obfuscated version
-        run: mv target/contract-library-2.0-SNAPSHOT-obfuscated.jar target/contract-library-2.0-SNAPSHOT.jar
+        run: mv target/contract-library-2.0-SNAPSHOT.jar-obfuscated.jar target/contract-library-2.0-SNAPSHOT.jar
       - name: Deploy to Maven Central
         env:
           CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
