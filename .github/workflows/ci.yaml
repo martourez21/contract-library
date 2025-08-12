@@ -203,7 +203,7 @@ jobs:
           <settings>
             <servers>
               <server>
-                <id>central</id>
+                <id>ossrh</id>
                 <username>${{ secrets.CENTRAL_TOKEN_USERNAME }}</username>
                 <password>${{ secrets.CENTRAL_TOKEN_PASSWORD }}</password>
               </server>
