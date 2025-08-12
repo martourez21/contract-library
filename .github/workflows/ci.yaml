@@ -238,7 +238,7 @@ jobs:
 
       # Build the project first to generate all required artifacts
       - name: Build project with sources and javadoc
-        run: mvn clean compile package source:jar javadoc:jar -DskipTests
+        run: mvn clean compile package -DskipTests
 
       - uses: actions/download-artifact@v4
         with:
@@ -256,4 +256,4 @@ jobs:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-        run: mvn deploy -DskipTests -Dgpg.passphrase="${GPG_PASSPHRASE}"
+        run: mvn deploy -DskipTests -Dgpg.passphrase="${GPG_PASSPHRASE}" -Prelease
