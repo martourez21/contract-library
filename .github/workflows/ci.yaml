@@ -32,9 +32,9 @@ jobs:
           <settings>
             <servers>
               <server>
-                <id>central</id>
-                <username>${{ secrets.CENTRAL_TOKEN_USERNAME }}</username>
-                <password>${{ secrets.CENTRAL_TOKEN_PASSWORD }}</password>
+                <id>ossrh</id>
+                <username>${{ secrets.OSSRH_USERNAME }}</username>
+                <password>${{ secrets.OSSRH_TOKEN }}</password>
               </server>
             </servers>
             <profiles>
@@ -76,9 +76,9 @@ jobs:
           <settings>
             <servers>
               <server>
-                <id>central</id>
-                <username>${{ secrets.CENTRAL_TOKEN_USERNAME }}</username>
-                <password>${{ secrets.CENTRAL_TOKEN_PASSWORD }}</password>
+                <id>ossrh</id>
+                <username>${{ secrets.OSSRH_USERNAME }}</username>
+                <password>${{ secrets.OSSRH_TOKEN }}</password>
               </server>
             </servers>
             <profiles>
@@ -196,7 +196,7 @@ jobs:
           echo "$GPG_PRIVATE_KEY" | base64 --decode | gpg --import --batch --yes
           echo "use-agent" >> ~/.gnupg/gpg.conf
           echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
-      - name: Configure Maven settings
+      - name: Configure Maven settings for deployment
         run: |
           mkdir -p ~/.m2
           cat <<EOF > ~/.m2/settings.xml
@@ -204,13 +204,13 @@ jobs:
             <servers>
               <server>
                 <id>ossrh</id>
-                <username>${{ secrets.CENTRAL_TOKEN_USERNAME }}</username>
-                <password>${{ secrets.CENTRAL_TOKEN_PASSWORD }}</password>
+                <username>${{ secrets.OSSRH_USERNAME }}</username>
+                <password>${{ secrets.OSSRH_TOKEN }}</password>
               </server>
             </servers>
             <profiles>
               <profile>
-                <id>central</id>
+                <id>release</id>
                 <activation>
                   <activeByDefault>true</activeByDefault>
                 </activation>
@@ -230,22 +230,30 @@ jobs:
               </profile>
             </profiles>
             <activeProfiles>
-              <activeProfile>central</activeProfile>
+              <activeProfile>release</activeProfile>
               <activeProfile>guardsquare</activeProfile>
             </activeProfiles>
           </settings>
           EOF
+
+      # Build the project first to generate all required artifacts
+      - name: Build project with sources and javadoc
+        run: mvn clean compile package source:jar javadoc:jar -DskipTests
+
       - uses: actions/download-artifact@v4
         with:
           name: obfuscated-jar-${{ github.sha }}
           path: target/
+
       - name: List target files before rename
         run: ls -la target/
+
       - name: Replace main JAR with obfuscated version
         run: mv target/contract-library-2.0-SNAPSHOT.jar-obfuscated.jar target/contract-library-2.0-SNAPSHOT.jar
+
       - name: Deploy to Maven Central
         env:
-          CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
-          CENTRAL_TOKEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
-#          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-        run: mvn deploy -DskipTests
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: mvn deploy -DskipTests -Dgpg.passphrase="${GPG_PASSPHRASE}"
