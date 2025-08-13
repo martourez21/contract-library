@@ -4,7 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <!-- Changed groupId to match Maven Central namespace requirements -->
   <groupId>io.github.martourez21</groupId>
   <artifactId>contract-library</artifactId>
   <version>2.0-SNAPSHOT</version>
@@ -14,7 +13,6 @@
   <description>A comprehensive contract library for Java applications</description>
   <url>https://github.com/martourez21/contract-library</url>
 
-  <!-- Required for Maven Central -->
   <licenses>
     <license>
       <name>The Apache License, Version 2.0</name>
@@ -22,7 +20,6 @@
     </license>
   </licenses>
 
-  <!-- Required for Maven Central -->
   <developers>
     <developer>
       <id>martourez21</id>
@@ -31,7 +28,6 @@
     </developer>
   </developers>
 
-  <!-- Required for Maven Central -->
   <scm>
     <connection>scm:git:git://github.com/martourez21/contract-library.git</connection>
     <developerConnection>scm:git:ssh://github.com:martourez21/contract-library.git</developerConnection>
@@ -48,6 +44,7 @@
 
   <build>
     <plugins>
+      <!-- Compiler plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -58,14 +55,14 @@
         </configuration>
       </plugin>
 
-      <!-- Deploy plugin - explicit version -->
+      <!-- Deploy plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
         <version>${maven.deploy.plugin.version}</version>
       </plugin>
 
-      <!-- Source plugin for Maven Central -->
+      <!-- Attach sources -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
@@ -80,7 +77,7 @@
         </executions>
       </plugin>
 
-      <!-- Javadoc plugin for Maven Central -->
+      <!-- Attach Javadocs -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -100,7 +97,7 @@
         </configuration>
       </plugin>
 
-      <!-- GPG plugin for signing (required for Maven Central) -->
+      <!-- GPG signing -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
@@ -121,30 +118,15 @@
           </execution>
         </executions>
       </plugin>
-
-      <!-- Nexus staging plugin for deployment to Maven Central -->
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.13</version>
-        <extensions>true</extensions>
-        <configuration>
-          <serverId>ossrh</serverId>
-          <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-          <autoReleaseAfterClose>false</autoReleaseAfterClose>
-          <skipStaging>false</skipStaging>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
 
   <profiles>
-    <!-- Profile for releasing to Maven Central -->
+    <!-- Release profile -->
     <profile>
       <id>release</id>
       <build>
         <plugins>
-          <!-- Ensure sources are attached during release -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
@@ -158,8 +140,6 @@
               </execution>
             </executions>
           </plugin>
-
-          <!-- Ensure javadocs are attached during release -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
@@ -178,8 +158,6 @@
               <quiet>true</quiet>
             </configuration>
           </plugin>
-
-          <!-- GPG signing during release -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
@@ -205,15 +183,14 @@
     </profile>
   </profiles>
 
-  <!-- Distribution management for Maven Central via OSSRH -->
   <distributionManagement>
     <snapshotRepository>
       <id>ossrh</id>
-      <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+      <url>https://central.sonatype.com/content/repositories/snapshots</url>
     </snapshotRepository>
     <repository>
       <id>ossrh</id>
-      <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+      <url>https://central.sonatype.com/content/repositories/releases</url>
     </repository>
   </distributionManagement>
 </project>
