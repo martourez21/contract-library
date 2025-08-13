@@ -185,11 +185,11 @@
 
   <distributionManagement>
     <snapshotRepository>
-      <id>ossrh</id>
+      <id>central</id>
       <url>https://central.sonatype.com/content/repositories/snapshots</url>
     </snapshotRepository>
     <repository>
-      <id>ossrh</id>
+      <id>central</id>
       <url>https://central.sonatype.com/content/repositories/releases</url>
     </repository>
   </distributionManagement>
